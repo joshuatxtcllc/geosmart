@@ -1,0 +1,92 @@
+graph TB
+    subgraph "Client Applications"
+        WebApp[Web Dashboard]
+        MobileApp[Mobile Apps]
+        DesktopApp[Desktop App]
+    end
+
+    subgraph "API Gateway"
+        APIGateway[API Gateway / Load Balancer]
+    end
+
+    subgraph "Backend Services"
+        AuthService[Authentication Service]
+        UserService[User Management]
+        CallService[Call Processing]
+        SMSService[SMS Service]
+        NumberService[Phone Number Management]
+        AnalyticsService[Analytics Service]
+        BillingService[Billing Service]
+        WebhookService[Webhook Service]
+    end
+
+    subgraph "External Integrations"
+        Twilio[Twilio API]
+        CRM[CRM Integrations]
+        PaymentGateway[Payment Gateway]
+    end
+
+    subgraph "Databases & Caching"
+        MongoDB[(MongoDB)]
+        Redis[(Redis Cache)]
+        S3[(Object Storage)]
+    end
+
+    subgraph "Real-time Communication"
+        WebSockets[WebSocket Server]
+        MessageQueue[Message Queue]
+    end
+
+    %% Client connections
+    WebApp --> APIGateway
+    MobileApp --> APIGateway
+    DesktopApp --> APIGateway
+    
+    %% API Gateway connections
+    APIGateway --> AuthService
+    APIGateway --> UserService
+    APIGateway --> CallService
+    APIGateway --> SMSService
+    APIGateway --> NumberService
+    APIGateway --> AnalyticsService
+    APIGateway --> BillingService
+    APIGateway --> WebhookService
+    
+    %% Backend to database connections
+    AuthService --> MongoDB
+    UserService --> MongoDB
+    CallService --> MongoDB
+    SMSService --> MongoDB
+    NumberService --> MongoDB
+    AnalyticsService --> MongoDB
+    BillingService --> MongoDB
+    
+    %% Caching connections
+    AuthService --> Redis
+    CallService --> Redis
+    SMSService --> Redis
+    AnalyticsService --> Redis
+    
+    %% External service connections
+    CallService --> Twilio
+    SMSService --> Twilio
+    NumberService --> Twilio
+    BillingService --> PaymentGateway
+    WebhookService --> CRM
+    
+    %% Real-time connections
+    WebApp --> WebSockets
+    MobileApp --> WebSockets
+    DesktopApp --> WebSockets
+    
+    %% Message queue
+    CallService --> MessageQueue
+    SMSService --> MessageQueue
+    WebhookService <-- Async processing --> MessageQueue
+    AnalyticsService <-- Event processing --> MessageQueue
+    
+    %% Object storage for recordings, etc.
+    CallService --> S3
+    
+    %% Webhook callbacks from Twilio
+    Twilio --> WebhookService
